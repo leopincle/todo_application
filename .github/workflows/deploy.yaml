@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
     paths:
       - '**'
       - '!kubernetes/**'
@@ -34,16 +34,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        repository: ${{ secrets.DOCKER_USERNAME }}/kubernetes-manifests
+        repository: ${{ secrets.DOCKER_USERNAME }}/todo_artifacts
+        token: ${{ secrets.REPO_TOKEN }}
 
     - name: Updating deployment file with new image tag
       run: |
-        sed -i 's|image: ${{ secrets.DOCKER_USERNAME }}/todoapp:.*|image: ${{ secrets.DOCKER_USERNAME }}/todoapp:${{ github.run_id }}|g' $GITHUB_WORKSPACE/kubernetes-manifests/todo-app/deployment.yaml
+          sed -i -E \
+          "s|(image:\s*${{ secrets.DOCKER_USERNAME }}/todoapp:).*|\1${{ github.run_id }}|" \
+          deployment.yaml
+
     - name: Commit and Push changes
       run: |
         git config --global user.name "github-actions"
-        git config --global user.email "
-        git add .
-        git commit -m "Update todoapp image to ${{ github.run_id }}"
-        git push origin master
+        git config --global user.email "github-actions@github.com"
+        git add deployment.yaml
+        git commit -m "Update todoapp image to ${{ github.run_id }}" || echo "No changes to commit"
+        git push origin HEAD
         
