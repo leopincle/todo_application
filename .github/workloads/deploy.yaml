@@ -38,3 +38,7 @@ jobs:
       run: |
           ls -R $GITHUB_WORKSPACE/todo-application
           ls -R $GITHUB_WORKSPACE/kubernetes-manifests
+    - name: Updating deployment file with new image tag
+      run: |
+        sed -i 's|image: leopincle/todoapp:.*|image: leopincle/todoapp:${{ github.sha }}|g' $GITHUB_WORKSPACE/kubernetes-manifests/todo-app/deployment.yaml
+        
