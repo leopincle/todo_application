@@ -1,5 +1,6 @@
 name: todo-app-deployment
 on: 
+  workflow_dispatch:
   push:
     paths-ignore:
       - '.github/workflows/**'
